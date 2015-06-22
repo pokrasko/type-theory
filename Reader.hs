@@ -256,9 +256,9 @@ lexing p ('.':cs)	= TokenDot		: lexing TokenDot cs
 lexing p ('(':cs)	= TokenLB		: lexing TokenLB cs
 lexing p (')':cs)	= TokenRB		: lexing TokenRB cs
 lexing p (c:cs)
-	| isSpace c = case cs of
-				  []	-> []
-				  _		-> case p of
+	| isSpace c = case (span isSpace cs) of
+				  (_, []) 	-> []
+				  (_, _)	-> case p of
 				  		   TokenRB		-> TokenSpace : lexing TokenSpace cs
 				  		   TokenVar c'	-> TokenSpace : lexing TokenSpace cs
 				  		   otherwise		-> lexing p cs
