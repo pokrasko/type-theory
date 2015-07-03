@@ -11,8 +11,8 @@ freeVariables :: Expression -> String
 freeVariables = Prelude.foldl foldVariables [] . toList . expressionToSet
 
 expressionToSet :: Expression -> Set String
-expressionToSet (Var x) = singleton x
-expressionToSet (Lambda x a) = if member x (expressionToSet a)
-							   then delete x (expressionToSet a)
-							   else expressionToSet a
-expressionToSet (Apply a b) = union (expressionToSet a) (expressionToSet b)
+expressionToSet (Var x)			= 	singleton x
+expressionToSet (Lambda x a)	= 	if member x (expressionToSet a)
+									then delete x (expressionToSet a)
+									else expressionToSet a
+expressionToSet (Apply a b)		= 	union (expressionToSet a) (expressionToSet b)

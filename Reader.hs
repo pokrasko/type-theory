@@ -2,6 +2,7 @@
 module Reader where
 
 import Data.Char
+import Data.List.Split
 import Expression
 import Control.Applicative(Applicative(..))
 import Control.Monad (ap)
@@ -232,6 +233,7 @@ happyReturn1 = \a tks -> (return) a
 happyError' :: () => [(Token)] -> HappyIdentity a
 happyError' = HappyIdentity . parseError
 
+parseLambda :: [Token] -> Expression
 parseLambda tks = happyRunIdentity happySomeParser where
   happySomeParser = happyThen (happyParse action_0 tks) (\x -> case x of {HappyAbsSyn4 z -> happyReturn z; _other -> notHappyAtAll })
 
@@ -257,16 +259,16 @@ lexing p ('(':cs)	= TokenLB		: lexing TokenLB cs
 lexing p (')':cs)	= TokenRB		: lexing TokenRB cs
 lexing p (c:cs)
 	| isSpace c = case (span isSpace cs) of
-				  (_, []) 	-> []
-				  (_, _)	-> case p of
-				  		   TokenRB		-> TokenSpace : lexing TokenSpace cs
-				  		   TokenVar c'	-> TokenSpace : lexing TokenSpace cs
-				  		   otherwise		-> lexing p cs
+				  (_, []) 	->	[]
+				  (_, _)	->	case p of
+								TokenRB		-> TokenSpace : lexing TokenSpace cs
+				  		   		TokenVar c'	-> TokenSpace : lexing TokenSpace cs
+				  		   		otherwise	-> lexing p cs
 	| isAlpha c = lexVar p (c:cs)
 
 lexVar :: Token -> String -> [Token]
 lexVar p cs = let (var, rest) = span isVarLetter cs in
-			TokenVar var : lexing (TokenVar var) rest
+				  TokenVar var : lexing (TokenVar var) rest
 
 isVarLetter :: Char -> Bool
 isVarLetter c = isAlpha c || isDigit c || c == '\''
@@ -274,7 +276,14 @@ isVarLetter c = isAlpha c || isDigit c || c == '\''
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
+readLambda :: String -> Expression
 readLambda = parseLambda . lexer
+
+readVar :: String -> String
+readVar s = case s of
+			[]			->	[]
+			(' ' : cs) 	->	readVar cs
+			s			->	head $ splitOn " " s
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "<built-in>" #-}
