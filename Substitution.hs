@@ -1,5 +1,6 @@
 module Substitution where
 
+import Bruijn
 import Data.Set as Set
 import Expression
 import Free
@@ -21,3 +22,13 @@ substituteWV' bb a y (Apply b c)		=	case substituteWV' bb a y b of
 											Just sb	->	case substituteWV' bb a y c of
 														Nothing	->	Nothing
 														Just sc	->	Just $ Apply sb sc
+
+substitute :: BExpression -> BExpression -> BExpression
+substitute = substituteN 1
+
+substituteN :: Int -> BExpression -> BExpression -> BExpression
+substituteN n a (BVar x)		=	if 		n == x
+									then	add 0 (n - 1) a
+									else	BVar x
+substituteN n a (BLambda b)		=	BLambda $ substituteN (n + 1) a b
+substituteN n a (BApply b c)	=	BApply (substituteN n a b) (substituteN n a c)
