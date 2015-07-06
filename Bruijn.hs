@@ -35,9 +35,9 @@ deBruijnize :: (BExpression, [String]) -> (Expression, Int)
 deBruijnize (e, l) = (deBruijnize' 0 (e, l), length l)
 
 deBruijnize' :: Int -> (BExpression, [String]) -> Expression
-deBruijnize' _ (BVar x, list)		=	if 		x - 1 < length list
-										then	Var $ list !! (x - 1)
-										else	Var $ randomName (x - 1)
+deBruijnize' n (BVar x, list)		=	if 		n - x < length list
+										then	Var $ list !! (n - x)
+										else	Var $ randomName (n - x)
 deBruijnize' n (BLambda a, list)	=	if		n < length list
 										then	Lambda (list !! n) $ deBruijnize' (n + 1) (a, list)
 										else	Lambda (randomName n) $ deBruijnize' (n + 1) (a, list)

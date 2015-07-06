@@ -27,8 +27,10 @@ substitute :: BExpression -> BExpression -> BExpression
 substitute = substituteN 1
 
 substituteN :: Int -> BExpression -> BExpression -> BExpression
-substituteN n a (BVar x)		=	if 		n == x
+substituteN n a (BVar x)		=	if		x == n
 									then	add 0 (n - 1) a
-									else	BVar x
+									else	if		x > n
+											then	BVar $ x - 1
+											else	BVar x
 substituteN n a (BLambda b)		=	BLambda $ substituteN (n + 1) a b
 substituteN n a (BApply b c)	=	BApply (substituteN n a b) (substituteN n a c)
